@@ -1,25 +1,12 @@
 (* ::Package:: *)
 
 LaunchKernels[];
-(* Get command-line arguments using $CommandLine *)
-commandLineArguments = Rest[$CommandLine];
-
-(* Split the input string into individual arguments using a comma as the delimiter *)
-argumentString = commandLineArguments[[3]];
-argsList = StringSplit[argumentString, ","];
-
-(* Assign individual arguments to variables *)
- argument1 = argsList[[1]];
- argument2 = argsList[[2]];
- argument3 = argsList[[3]];
- argument4 = argsList[[4]];
- argument5 = argsList[[5]];
- argument6 = argsList[[6]];
- argument7 = argsList[[7]];
- argument8 = argsList[[8]];
   
- (*Set the desired output folder*)
-sOutputFolder = "/home/redad/Diffraction simulation/";
+sampleID = "SampleID";
+recipeID = "Recipe";
+beamlineID = "Beamline";  
+(*Set the desired output folder*)
+sOutputFolder = "OutputFolder";
 
 (* Create the directory if it doesnt exist *)
 If[!DirectoryQ[sOutputFolder],
@@ -157,35 +144,6 @@ If[Chop[Abs[cSF]^2]>0,
 lHKLSF=AppendTo[lHKLSF,<|"lHKL"->lHKL,"lGhkl"->lg,"rGhkl"->rg,"rFF"->rFF,"rDW"->rDW,"SF"->Chop[cSF],"rSFI"->Chop[Abs[cSF]^2]|>]],
 {ihkl,Length[lHKLs]}];
 Return[lHKLSF]]
-
-
-(* ::Input::Initialization:: *)
-aUCCu=<|"lLd"->a0 IdentityMatrix[3],"lPts"->a0{{0,0,0},{1/2,1/2,0},{0,1/2,1/2},{1/2,0,1/2}},"lBas"->{<|"sEl"->"Cu","lPos"->{0,0,0},"rOcc"->1.0|> }|>/.a0->0.3615;
-
-
-(* ::Input::Initialization:: *)
-aUCCu["lLd"][[2]]//MatrixForm
-
-
-(* ::Input::Initialization:: *)
-AssociateTo[aUCCu,"lLp"->LinearSolve[aUCCu["lLd"],IdentityMatrix[3]]];
-
-
-(* ::Input::Initialization:: *)
-aUCCu["lLp"]//MatrixForm
-
-
-(* ::Input::Initialization:: *)
-aUCCu["lLp"] . aUCCu["lLd"]==IdentityMatrix[3]
-
-
-(* ::Input::Initialization:: *)
-iHKL=4;
-lHKLs=DeleteCases[Flatten[Table[{h,k,l},{h,-iHKL,iHKL},{k,-iHKL,iHKL},{l,-iHKL,iHKL}],2],{0,0,0}];
-
-
-(* ::Input::Initialization:: *)
-lSFCu=lSF[aUCCu,lHKLs, "Cu-A1"];
 
 
 (* ::Input::Initialization:: *)
@@ -361,11 +319,11 @@ Return[Image[dat]//ImageAdjust]]
 
 
 (* ::Input::Initialization:: *)
-nGrains=ToExpression[argument1];
+nGrains=100;
 
 
 (* ::Input::Initialization:: *)
-nPatterns=ToExpression[argument2];
+nPatterns=2;
 
 
 
@@ -394,8 +352,8 @@ rFSTiBeta[]:=rRandomVolume[aGSDTiBeta];
 
 
 (* ::Input::Initialization:: *)
-rPhaseFracAust=ToExpression[argument3];
-rPhaseFracAlphaInTi64=ToExpression[argument4];
+rPhaseFracAust=0.5;
+rPhaseFracAlphaInTi64=0.5;
 rPhaseFracTi64=1.00-rPhaseFracAust;
 rPhaseFracAlpha=rPhaseFracAlphaInTi64 rPhaseFracTi64;
 rPhaseFracBeta=1-rPhaseFracAlpha -rPhaseFracAust;
@@ -432,7 +390,7 @@ data1 = {
   "ID Sample" -> {
     "@type" -> "Identifier",
     "description" -> "The unique sample ID.",
-    "value" -> ToString[argument5],
+    "value" -> sampleID,
     "unitText" -> "Null",
     "alternativeIdentifier" -> "sample ID"
   },
@@ -503,7 +461,7 @@ data2 = {
   "ID Recipe" -> {
     "@type" -> "Identifier",
     "description" -> "The unique sample ID.",
-    "value" -> ToString[argument6],
+    "value" -> recipeID,
     "unitText" -> "Null",
     "alternativeIdentifier" -> "recipe ID"
   },
@@ -597,14 +555,10 @@ data3 = {
 };
 
 resultJSON = Join[context, data3];
-Export[sOutputFolder<>ToString[argument5]<>"-"<>ToString[argument6]<>"-"<>ToString[argument7]<>"-"<>ToString[argument8]<>".tiff",iDP,ImageEncoding->"LZW","BitDepth"->32];Export[sOutputFolder<>ToString[argument5]<>"-"<>ToString[argument6]<>"-"<>ToString[argument7]<>"-"<>ToString[argument8]<>".json",resultJSON];
-Export[sOutputFolder<>ToString[argument5]<>".json", sampleJSON];
-Export[sOutputFolder<>ToString[argument6]<>".json", recipeJSON],
+Export[sOutputFolder<>ToString[sampleID]<>"-"<>ToString[recipeID]<>"-"<>ToString[beamlineID]<>"-"<>DateString[{"Year","Month","Day","Hour","Minute","Second"}]<>"-"<>ToString[i]<>".tiff",iDP,ImageEncoding->"LZW","BitDepth"->32];Export[sOutputFolder<>ToString[sampleID]<>"-"<>ToString[recipeID]<>"-"<>ToString[beamlineID]<>"-"<>DateString[{"Year","Month","Day","Hour","Minute","Second"}]<>"-"<>ToString[i]<>".json",resultJSON];
+Export[sOutputFolder<>ToString[sampleID]<>".json", sampleJSON];
+Export[sOutputFolder<>ToString[recipeID]<>".json", recipeJSON],
 {i,nPatterns}]]]
-
-
-(* ::Input::Initialization:: *)
-(*imgLin*)
 
 
 (* ::Input::Initialization:: *)
